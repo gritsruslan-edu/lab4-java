@@ -30,20 +30,24 @@ public class Main {
 
         while (running) {
             System.out.println("\nОберіть дію:");
-            System.out.println("1 - Створити новий об'єкт");
-            System.out.println("2 - Вивести всі книги");
-            System.out.println("3 - Завершити програму");
+            System.out.println("1 - Пошук об'єкта");
+            System.out.println("2 - Створити новий об'єкт");
+            System.out.println("3 - Вивести всі книги");
+            System.out.println("4 - Завершити програму");
 
             String choice = scanner.nextLine();
 
             switch (choice) {
                 case "1":
-                    createBookByType(scanner, books);
+                    searchMenu(scanner, books);
                     break;
                 case "2":
-                    printBooks(books);
+                    createBookByType(scanner, books);
                     break;
                 case "3":
+                    printBooks(books);
+                    break;
+                case "4":
                     saveBooksToFile(books);
                     running = false;
                     System.out.println("Програму завершено.");
@@ -54,6 +58,143 @@ public class Main {
         }
 
         scanner.close();
+    }
+
+    /**
+     * Виводить підменю пошуку.
+     */
+    private static void searchMenu(Scanner scanner, List<Book> books) {
+        boolean searching = true;
+
+        while (searching) {
+            System.out.println("\nПідменю пошуку:");
+            System.out.println("1 - Пошук за назвою");
+            System.out.println("2 - Пошук за автором");
+            System.out.println("3 - Пошук за жанром");
+            System.out.println("4 - Повернутися до головного меню");
+
+            String choice = scanner.nextLine();
+
+            switch (choice) {
+                case "1":
+                    searchByTitle(scanner, books);
+                    break;
+                case "2":
+                    searchByAuthor(scanner, books);
+                    break;
+                case "3":
+                    searchByGenre(scanner, books);
+                    break;
+                case "4":
+                    searching = false;
+                    break;
+                default:
+                    System.out.println("Невірний вибір. Спробуйте ще раз.");
+            }
+        }
+    }
+
+    /**
+     * Виконує пошук книг за назвою.
+     */
+    private static void searchByTitle(Scanner scanner, List<Book> books) {
+        System.out.print("Введіть назву для пошуку: ");
+        String title = scanner.nextLine().trim();
+
+        List<Book> foundBooks = findBooksByTitle(books, title);
+        printSearchResults(foundBooks);
+    }
+
+    /**
+     * Виконує пошук книг за автором.
+     */
+    private static void searchByAuthor(Scanner scanner, List<Book> books) {
+        System.out.print("Введіть автора для пошуку: ");
+        String author = scanner.nextLine().trim();
+
+        List<Book> foundBooks = findBooksByAuthor(books, author);
+        printSearchResults(foundBooks);
+    }
+
+    /**
+     * Виконує пошук книг за жанром.
+     */
+    private static void searchByGenre(Scanner scanner, List<Book> books) {
+        System.out.println("Оберіть жанр із переліку:");
+        for (Genre genre : Genre.values()) {
+            System.out.println("- " + genre);
+        }
+
+        System.out.print("Введіть жанр для пошуку: ");
+        String genreInput = scanner.nextLine().trim().toUpperCase();
+
+        try {
+            Genre genre = Genre.valueOf(genreInput);
+            List<Book> foundBooks = findBooksByGenre(books, genre);
+            printSearchResults(foundBooks);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Помилка: такого жанру не існує.");
+        }
+    }
+
+    /**
+     * Повертає всі книги, що відповідають назві.
+     */
+    private static List<Book> findBooksByTitle(List<Book> books, String title) {
+        List<Book> foundBooks = new ArrayList<>();
+
+        for (Book book : books) {
+            if (book.getTitle().equalsIgnoreCase(title)) {
+                foundBooks.add(book);
+            }
+        }
+
+        return foundBooks;
+    }
+
+    /**
+     * Повертає всі книги, що відповідають автору.
+     */
+    private static List<Book> findBooksByAuthor(List<Book> books, String author) {
+        List<Book> foundBooks = new ArrayList<>();
+
+        for (Book book : books) {
+            if (book.getAuthor().equalsIgnoreCase(author)) {
+                foundBooks.add(book);
+            }
+        }
+
+        return foundBooks;
+    }
+
+    /**
+     * Повертає всі книги, що відповідають жанру.
+     */
+    private static List<Book> findBooksByGenre(List<Book> books, Genre genre) {
+        List<Book> foundBooks = new ArrayList<>();
+
+        for (Book book : books) {
+            if (book.getGenre() == genre) {
+                foundBooks.add(book);
+            }
+        }
+
+        return foundBooks;
+    }
+
+    /**
+     * Виводить результати пошуку.
+     */
+    private static void printSearchResults(List<Book> foundBooks) {
+        if (foundBooks.isEmpty()) {
+            System.out.println("Жоден об'єкт не відповідає умовам пошуку.");
+            return;
+        }
+
+        System.out.println("Знайдені об'єкти:");
+        for (Book book : foundBooks) {
+            System.out.println(book);
+        }
     }
 
     /**
