@@ -7,21 +7,69 @@ import java.util.Objects;
  */
 public class Book {
 
+    /**
+     * Лічильник створених об'єктів Book.
+     */
+    private static int bookCount = 0;
+
+    /**
+     * Назва книги.
+     */
     private String title;
+
+    /**
+     * Автор книги.
+     */
     private String author;
+
+    /**
+     * Рік публікації книги.
+     */
     private int year;
+
+    /**
+     * Кількість сторінок у книзі.
+     */
     private int pages;
-    private String genre;
+
+    /**
+     * Жанр книги.
+     */
+    private Genre genre;
 
     /**
      * Створює новий об'єкт книги з базовою валідацією.
      */
-    public Book(String title, String author, int year, int pages, String genre) {
+    public Book(String title, String author, int year, int pages, Genre genre) {
         setTitle(title);
         setAuthor(author);
         setYear(year);
         setPages(pages);
         setGenre(genre);
+        bookCount++;
+    }
+
+    /**
+     * Конструктор копіювання.
+     */
+    public Book(Book other) {
+        if (other == null) {
+            throw new IllegalArgumentException("Об'єкт для копіювання не може бути null.");
+        }
+
+        this.title = other.title;
+        this.author = other.author;
+        this.year = other.year;
+        this.pages = other.pages;
+        this.genre = other.genre;
+        bookCount++;
+    }
+
+    /**
+     * Повертає кількість створених об'єктів Book.
+     */
+    public static int getBookCount() {
+        return bookCount;
     }
 
     /**
@@ -69,8 +117,8 @@ public class Book {
      * Встановлює рік публікації.
      */
     public void setYear(int year) {
-        if (year < 1450 || year > 2025) {
-            throw new IllegalArgumentException("Рік публікації має бути між 1450 та 2025.");
+        if (year < 1450 || year > 2026) {
+            throw new IllegalArgumentException("Рік публікації має бути між 1450 та 2026.");
         }
         this.year = year;
     }
@@ -95,16 +143,16 @@ public class Book {
     /**
      * Повертає жанр книги.
      */
-    public String getGenre() {
+    public Genre getGenre() {
         return genre;
     }
 
     /**
      * Встановлює жанр книги.
      */
-    public void setGenre(String genre) {
-        if (genre == null || genre.trim().isEmpty()) {
-            throw new IllegalArgumentException("Жанр не може бути порожнім.");
+    public void setGenre(Genre genre) {
+        if (genre == null) {
+            throw new IllegalArgumentException("Жанр не може бути null.");
         }
         this.genre = genre;
     }
@@ -114,12 +162,13 @@ public class Book {
      */
     @Override
     public String toString() {
-        return "Book " +
+        return "Book{" +
                 "title='" + title + '\'' +
                 ", author='" + author + '\'' +
                 ", year=" + year +
                 ", pages=" + pages +
-                ", genre='" + genre + '\'';
+                ", genre=" + genre +
+                '}';
     }
 
     /**
@@ -134,6 +183,14 @@ public class Book {
                 pages == book.pages &&
                 Objects.equals(title, book.title) &&
                 Objects.equals(author, book.author) &&
-                Objects.equals(genre, book.genre);
+                genre == book.genre;
+    }
+
+    /**
+     * Повертає хеш-код книги.
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(title, author, year, pages, genre);
     }
 }
