@@ -1,4 +1,4 @@
-﻿package org.sumdu;
+package org.sumdu;
 
 import java.util.ArrayList;
 import java.util.List;

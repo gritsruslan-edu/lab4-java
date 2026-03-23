@@ -1,4 +1,4 @@
-﻿package org.sumdu;
+package org.sumdu;
 
 /**
  * Перерахування жанрів книг.
