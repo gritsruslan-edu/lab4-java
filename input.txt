@@ -1,0 +1,3 @@
+EBook;Book1;author1;1999;2000;FANTASY;PDF;100.0
+PrintedBook;Book2;author12;1800;2000;POETRY;Integral;10
+AudioBook;Audio;Author;2005;200;DETECTIVE;Dictor;300

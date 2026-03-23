@@ -1,5 +1,10 @@
 package org.sumdu;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -10,17 +15,20 @@ import java.util.Scanner;
 public class Main {
 
     /**
+     * Шлях до файлу збереження.
+     */
+    private static final String FILE_NAME = "input.txt";
+
+    /**
      * Точка входу в програму.
      */
     public static void main(String[] args) {
-
         Scanner scanner = new Scanner(System.in);
-        List<Book> books = new ArrayList<>();
+        List<Book> books = loadBooksFromFile();
 
         boolean running = true;
 
         while (running) {
-
             System.out.println("\nОберіть дію:");
             System.out.println("1 - Створити новий об'єкт");
             System.out.println("2 - Вивести всі книги");
@@ -36,6 +44,7 @@ public class Main {
                     printBooks(books);
                     break;
                 case "3":
+                    saveBooksToFile(books);
                     running = false;
                     System.out.println("Програму завершено.");
                     break;
@@ -246,6 +255,197 @@ public class Main {
 
         for (Book book : books) {
             System.out.println(book);
+        }
+    }
+
+    /**
+     * Завантажує книги з файлу.
+     */
+    private static List<Book> loadBooksFromFile() {
+        List<Book> books = new ArrayList<>();
+        Path path = Path.of(FILE_NAME);
+
+        if (!Files.exists(path)) {
+            return books;
+        }
+
+        try (BufferedReader reader = Files.newBufferedReader(path)) {
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                if (line.trim().isEmpty()) {
+                    continue;
+                }
+
+                books.add(parseBook(line));
+            }
+
+            System.out.println("Книги успішно завантажено з файлу.");
+            return books;
+
+        } catch (Exception e) {
+            System.out.println("Помилка зчитування файлу input.txt. Програму буде запущено з порожнім списком книг.");
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Зберігає книги у файл.
+     */
+    private static void saveBooksToFile(List<Book> books) {
+        Path path = Path.of(FILE_NAME);
+
+        try (BufferedWriter writer = Files.newBufferedWriter(path)) {
+            for (Book book : books) {
+                writer.write(serializeBook(book));
+                writer.newLine();
+            }
+
+            System.out.println("Книги успішно збережено у файл.");
+
+        } catch (IOException e) {
+            System.out.println("Не вдалося зберегти книги у файл.");
+        }
+    }
+
+    /**
+     * Перетворює книгу у рядок для збереження.
+     */
+    private static String serializeBook(Book book) {
+        if (book instanceof EBook eBook) {
+            return "EBook;" +
+                    eBook.getTitle() + ";" +
+                    eBook.getAuthor() + ";" +
+                    eBook.getYear() + ";" +
+                    eBook.getPages() + ";" +
+                    eBook.getGenre() + ";" +
+                    eBook.getFileFormat() + ";" +
+                    eBook.getFileSize();
+        }
+
+        if (book instanceof PrintedBook printedBook) {
+            return "PrintedBook;" +
+                    printedBook.getTitle() + ";" +
+                    printedBook.getAuthor() + ";" +
+                    printedBook.getYear() + ";" +
+                    printedBook.getPages() + ";" +
+                    printedBook.getGenre() + ";" +
+                    printedBook.getCoverType() + ";" +
+                    printedBook.getPrintRun();
+        }
+
+        if (book instanceof AudioBook audioBook) {
+            return "AudioBook;" +
+                    audioBook.getTitle() + ";" +
+                    audioBook.getAuthor() + ";" +
+                    audioBook.getYear() + ";" +
+                    audioBook.getPages() + ";" +
+                    audioBook.getGenre() + ";" +
+                    audioBook.getNarrator() + ";" +
+                    audioBook.getDurationMinutes();
+        }
+
+        if (book instanceof ScientificBook scientificBook) {
+            return "ScientificBook;" +
+                    scientificBook.getTitle() + ";" +
+                    scientificBook.getAuthor() + ";" +
+                    scientificBook.getYear() + ";" +
+                    scientificBook.getPages() + ";" +
+                    scientificBook.getGenre() + ";" +
+                    scientificBook.getFieldOfScience() + ";" +
+                    scientificBook.isPeerReviewed();
+        }
+
+        return "Book;" +
+                book.getTitle() + ";" +
+                book.getAuthor() + ";" +
+                book.getYear() + ";" +
+                book.getPages() + ";" +
+                book.getGenre();
+    }
+
+    /**
+     * Створює об'єкт книги з рядка файлу.
+     */
+    private static Book parseBook(String line) {
+        String[] parts = line.split(";");
+
+        if (parts.length == 0) {
+            throw new IllegalArgumentException("Порожній рядок.");
+        }
+
+        String type = parts[0];
+
+        switch (type) {
+            case "Book":
+                requirePartsCount(parts, 6);
+                return new Book(
+                        parts[1],
+                        parts[2],
+                        Integer.parseInt(parts[3]),
+                        Integer.parseInt(parts[4]),
+                        Genre.valueOf(parts[5])
+                );
+
+            case "EBook":
+                requirePartsCount(parts, 8);
+                return new EBook(
+                        parts[1],
+                        parts[2],
+                        Integer.parseInt(parts[3]),
+                        Integer.parseInt(parts[4]),
+                        Genre.valueOf(parts[5]),
+                        parts[6],
+                        Double.parseDouble(parts[7])
+                );
+
+            case "PrintedBook":
+                requirePartsCount(parts, 8);
+                return new PrintedBook(
+                        parts[1],
+                        parts[2],
+                        Integer.parseInt(parts[3]),
+                        Integer.parseInt(parts[4]),
+                        Genre.valueOf(parts[5]),
+                        parts[6],
+                        Integer.parseInt(parts[7])
+                );
+
+            case "AudioBook":
+                requirePartsCount(parts, 8);
+                return new AudioBook(
+                        parts[1],
+                        parts[2],
+                        Integer.parseInt(parts[3]),
+                        Integer.parseInt(parts[4]),
+                        Genre.valueOf(parts[5]),
+                        parts[6],
+                        Integer.parseInt(parts[7])
+                );
+
+            case "ScientificBook":
+                requirePartsCount(parts, 8);
+                return new ScientificBook(
+                        parts[1],
+                        parts[2],
+                        Integer.parseInt(parts[3]),
+                        Integer.parseInt(parts[4]),
+                        Genre.valueOf(parts[5]),
+                        parts[6],
+                        Boolean.parseBoolean(parts[7])
+                );
+
+            default:
+                throw new IllegalArgumentException("Невідомий тип книги.");
+        }
+    }
+
+    /**
+     * Перевіряє кількість частин у рядку.
+     */
+    private static void requirePartsCount(String[] parts, int expected) {
+        if (parts.length != expected) {
+            throw new IllegalArgumentException("Невірний формат рядка.");
         }
     }
 }
