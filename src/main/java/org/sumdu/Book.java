@@ -3,14 +3,9 @@ package org.sumdu;
 import java.util.Objects;
 
 /**
- * Клас, що представляє книгу в бібліотеці.
+ * Базовий клас, що представляє книгу.
  */
 public class Book {
-
-    /**
-     * Лічильник створених об'єктів Book.
-     */
-    private static int bookCount = 0;
 
     /**
      * Назва книги.
@@ -28,7 +23,7 @@ public class Book {
     private int year;
 
     /**
-     * Кількість сторінок у книзі.
+     * Кількість сторінок.
      */
     private int pages;
 
@@ -38,7 +33,7 @@ public class Book {
     private Genre genre;
 
     /**
-     * Створює новий об'єкт книги з базовою валідацією.
+     * Створює новий об'єкт книги.
      */
     public Book(String title, String author, int year, int pages, Genre genre) {
         setTitle(title);
@@ -46,7 +41,6 @@ public class Book {
         setYear(year);
         setPages(pages);
         setGenre(genre);
-        bookCount++;
     }
 
     /**
@@ -62,14 +56,6 @@ public class Book {
         this.year = other.year;
         this.pages = other.pages;
         this.genre = other.genre;
-        bookCount++;
-    }
-
-    /**
-     * Повертає кількість створених об'єктів Book.
-     */
-    public static int getBookCount() {
-        return bookCount;
     }
 
     /**
@@ -172,22 +158,21 @@ public class Book {
     }
 
     /**
-     * Порівнює книги між собою.
+     * Порівнює поточний об'єкт з іншим.
      */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Book book)) return false;
-
-        return year == book.year &&
-                pages == book.pages &&
-                Objects.equals(title, book.title) &&
-                Objects.equals(author, book.author) &&
-                genre == book.genre;
+        return year == book.year
+                && pages == book.pages
+                && Objects.equals(title, book.title)
+                && Objects.equals(author, book.author)
+                && genre == book.genre;
     }
 
     /**
-     * Повертає хеш-код книги.
+     * Повертає хеш-код об'єкта.
      */
     @Override
     public int hashCode() {
