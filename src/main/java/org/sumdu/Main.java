@@ -5,7 +5,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -24,7 +23,7 @@ public class Main {
      */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        List<Book> books = loadBooksFromFile();
+        Library library = loadLibraryFromFile();
 
         boolean running = true;
 
@@ -39,16 +38,16 @@ public class Main {
 
             switch (choice) {
                 case "1":
-                    searchMenu(scanner, books);
+                    searchMenu(scanner, library);
                     break;
                 case "2":
-                    createBookByType(scanner, books);
+                    createBookByType(scanner, library);
                     break;
                 case "3":
-                    printBooks(books);
+                    printBooks(library);
                     break;
                 case "4":
-                    saveBooksToFile(books);
+                    saveLibraryToFile(library);
                     running = false;
                     System.out.println("Програму завершено.");
                     break;
@@ -63,7 +62,7 @@ public class Main {
     /**
      * Виводить підменю пошуку.
      */
-    private static void searchMenu(Scanner scanner, List<Book> books) {
+    private static void searchMenu(Scanner scanner, Library library) {
         boolean searching = true;
 
         while (searching) {
@@ -77,13 +76,13 @@ public class Main {
 
             switch (choice) {
                 case "1":
-                    searchByTitle(scanner, books);
+                    searchByTitle(scanner, library);
                     break;
                 case "2":
-                    searchByAuthor(scanner, books);
+                    searchByAuthor(scanner, library);
                     break;
                 case "3":
-                    searchByGenre(scanner, books);
+                    searchByGenre(scanner, library);
                     break;
                 case "4":
                     searching = false;
@@ -97,29 +96,29 @@ public class Main {
     /**
      * Виконує пошук книг за назвою.
      */
-    private static void searchByTitle(Scanner scanner, List<Book> books) {
+    private static void searchByTitle(Scanner scanner, Library library) {
         System.out.print("Введіть назву для пошуку: ");
         String title = scanner.nextLine().trim();
 
-        List<Book> foundBooks = findBooksByTitle(books, title);
-        printSearchResults(foundBooks);
+        List<Book> foundBooks = library.findBooksByTitle(title);
+        printSearchResults(foundBooks, library);
     }
 
     /**
      * Виконує пошук книг за автором.
      */
-    private static void searchByAuthor(Scanner scanner, List<Book> books) {
+    private static void searchByAuthor(Scanner scanner, Library library) {
         System.out.print("Введіть автора для пошуку: ");
         String author = scanner.nextLine().trim();
 
-        List<Book> foundBooks = findBooksByAuthor(books, author);
-        printSearchResults(foundBooks);
+        List<Book> foundBooks = library.findBooksByAuthor(author);
+        printSearchResults(foundBooks, library);
     }
 
     /**
      * Виконує пошук книг за жанром.
      */
-    private static void searchByGenre(Scanner scanner, List<Book> books) {
+    private static void searchByGenre(Scanner scanner, Library library) {
         System.out.println("Оберіть жанр із переліку:");
         for (Genre genre : Genre.values()) {
             System.out.println("- " + genre);
@@ -130,62 +129,17 @@ public class Main {
 
         try {
             Genre genre = Genre.valueOf(genreInput);
-            List<Book> foundBooks = findBooksByGenre(books, genre);
-            printSearchResults(foundBooks);
+            List<Book> foundBooks = library.findBooksByGenre(genre);
+            printSearchResults(foundBooks, library);
         } catch (IllegalArgumentException e) {
             System.out.println("Помилка: такого жанру не існує.");
         }
     }
 
     /**
-     * Повертає всі книги, що відповідають назві.
-     */
-    private static List<Book> findBooksByTitle(List<Book> books, String title) {
-        List<Book> foundBooks = new ArrayList<>();
-
-        for (Book book : books) {
-            if (book.getTitle().equalsIgnoreCase(title)) {
-                foundBooks.add(book);
-            }
-        }
-
-        return foundBooks;
-    }
-
-    /**
-     * Повертає всі книги, що відповідають автору.
-     */
-    private static List<Book> findBooksByAuthor(List<Book> books, String author) {
-        List<Book> foundBooks = new ArrayList<>();
-
-        for (Book book : books) {
-            if (book.getAuthor().equalsIgnoreCase(author)) {
-                foundBooks.add(book);
-            }
-        }
-
-        return foundBooks;
-    }
-
-    /**
-     * Повертає всі книги, що відповідають жанру.
-     */
-    private static List<Book> findBooksByGenre(List<Book> books, Genre genre) {
-        List<Book> foundBooks = new ArrayList<>();
-
-        for (Book book : books) {
-            if (book.getGenre() == genre) {
-                foundBooks.add(book);
-            }
-        }
-
-        return foundBooks;
-    }
-
-    /**
      * Виводить результати пошуку.
      */
-    private static void printSearchResults(List<Book> foundBooks) {
+    private static void printSearchResults(List<Book> foundBooks, Library library) {
         if (foundBooks.isEmpty()) {
             System.out.println("Жоден об'єкт не відповідає умовам пошуку.");
             return;
@@ -193,14 +147,14 @@ public class Main {
 
         System.out.println("Знайдені об'єкти:");
         for (Book book : foundBooks) {
-            System.out.println(book);
+            System.out.println(book + ", quantity=" + library.getQuantityForBook(book));
         }
     }
 
     /**
-     * Створює новий об'єкт вибраного типу та додає його до колекції.
+     * Створює новий об'єкт вибраного типу та додає його до бібліотеки.
      */
-    private static void createBookByType(Scanner scanner, List<Book> books) {
+    private static void createBookByType(Scanner scanner, Library library) {
         try {
             System.out.println("\nОберіть тип об'єкта:");
             System.out.println("1 - Book");
@@ -213,19 +167,19 @@ public class Main {
 
             switch (typeChoice) {
                 case "1":
-                    createBook(scanner, books);
+                    createBook(scanner, library);
                     break;
                 case "2":
-                    createEBook(scanner, books);
+                    createEBook(scanner, library);
                     break;
                 case "3":
-                    createPrintedBook(scanner, books);
+                    createPrintedBook(scanner, library);
                     break;
                 case "4":
-                    createAudioBook(scanner, books);
+                    createAudioBook(scanner, library);
                     break;
                 case "5":
-                    createScientificBook(scanner, books);
+                    createScientificBook(scanner, library);
                     break;
                 default:
                     System.out.println("Невірний тип об'єкта.");
@@ -238,15 +192,16 @@ public class Main {
     /**
      * Створює об'єкт базового класу Book.
      */
-    private static void createBook(Scanner scanner, List<Book> books) {
+    private static void createBook(Scanner scanner, Library library) {
         String title = readTitle(scanner);
         String author = readAuthor(scanner);
         int year = readYear(scanner);
         int pages = readPages(scanner);
         Genre genre = readGenre(scanner);
+        int quantity = readQuantity(scanner);
 
         Book book = new Book(title, author, year, pages, genre);
-        books.add(book);
+        library.addNewBook(book, quantity);
 
         System.out.println("Звичайну книгу успішно додано!");
     }
@@ -254,7 +209,7 @@ public class Main {
     /**
      * Створює об'єкт похідного класу EBook.
      */
-    private static void createEBook(Scanner scanner, List<Book> books) {
+    private static void createEBook(Scanner scanner, Library library) {
         String title = readTitle(scanner);
         String author = readAuthor(scanner);
         int year = readYear(scanner);
@@ -267,8 +222,10 @@ public class Main {
         System.out.print("Розмір файлу (MB): ");
         double fileSize = Double.parseDouble(scanner.nextLine());
 
+        int quantity = readQuantity(scanner);
+
         Book book = new EBook(title, author, year, pages, genre, fileFormat, fileSize);
-        books.add(book);
+        library.addNewBook(book, quantity);
 
         System.out.println("Електронну книгу успішно додано!");
     }
@@ -276,7 +233,7 @@ public class Main {
     /**
      * Створює об'єкт похідного класу PrintedBook.
      */
-    private static void createPrintedBook(Scanner scanner, List<Book> books) {
+    private static void createPrintedBook(Scanner scanner, Library library) {
         String title = readTitle(scanner);
         String author = readAuthor(scanner);
         int year = readYear(scanner);
@@ -289,8 +246,10 @@ public class Main {
         System.out.print("Тираж: ");
         int printRun = Integer.parseInt(scanner.nextLine());
 
+        int quantity = readQuantity(scanner);
+
         Book book = new PrintedBook(title, author, year, pages, genre, coverType, printRun);
-        books.add(book);
+        library.addNewBook(book, quantity);
 
         System.out.println("Друковану книгу успішно додано!");
     }
@@ -298,7 +257,7 @@ public class Main {
     /**
      * Створює об'єкт похідного класу AudioBook.
      */
-    private static void createAudioBook(Scanner scanner, List<Book> books) {
+    private static void createAudioBook(Scanner scanner, Library library) {
         String title = readTitle(scanner);
         String author = readAuthor(scanner);
         int year = readYear(scanner);
@@ -311,8 +270,10 @@ public class Main {
         System.out.print("Тривалість у хвилинах: ");
         int durationMinutes = Integer.parseInt(scanner.nextLine());
 
+        int quantity = readQuantity(scanner);
+
         Book book = new AudioBook(title, author, year, pages, genre, narrator, durationMinutes);
-        books.add(book);
+        library.addNewBook(book, quantity);
 
         System.out.println("Аудіокнигу успішно додано!");
     }
@@ -320,7 +281,7 @@ public class Main {
     /**
      * Створює об'єкт похідного класу ScientificBook.
      */
-    private static void createScientificBook(Scanner scanner, List<Book> books) {
+    private static void createScientificBook(Scanner scanner, Library library) {
         String title = readTitle(scanner);
         String author = readAuthor(scanner);
         int year = readYear(scanner);
@@ -333,8 +294,10 @@ public class Main {
         System.out.print("Чи є книга рецензованою? (true/false): ");
         boolean peerReviewed = Boolean.parseBoolean(scanner.nextLine());
 
+        int quantity = readQuantity(scanner);
+
         Book book = new ScientificBook(title, author, year, pages, genre, fieldOfScience, peerReviewed);
-        books.add(book);
+        library.addNewBook(book, quantity);
 
         System.out.println("Наукову книгу успішно додано!");
     }
@@ -386,28 +349,36 @@ public class Main {
     }
 
     /**
-     * Виводить усі книги з колекції.
+     * Зчитує кількість книги.
      */
-    private static void printBooks(List<Book> books) {
-        if (books.isEmpty()) {
+    private static int readQuantity(Scanner scanner) {
+        System.out.print("Кількість: ");
+        return Integer.parseInt(scanner.nextLine());
+    }
+
+    /**
+     * Виводить усі книги з бібліотеки.
+     */
+    private static void printBooks(Library library) {
+        if (library.isEmpty()) {
             System.out.println("Список книг порожній.");
             return;
         }
 
-        for (Book book : books) {
-            System.out.println(book);
+        for (int i = 0; i < library.getBooks().size(); i++) {
+            System.out.println(library.getBooks().get(i) + ", quantity=" + library.getQuantityByIndex(i));
         }
     }
 
     /**
-     * Завантажує книги з файлу.
+     * Завантажує бібліотеку з файлу.
      */
-    private static List<Book> loadBooksFromFile() {
-        List<Book> books = new ArrayList<>();
+    private static Library loadLibraryFromFile() {
+        Library library = new Library();
         Path path = Path.of(FILE_NAME);
 
         if (!Files.exists(path)) {
-            return books;
+            return library;
         }
 
         try (BufferedReader reader = Files.newBufferedReader(path)) {
@@ -418,27 +389,31 @@ public class Main {
                     continue;
                 }
 
-                books.add(parseBook(line));
+                ParsedBookData parsedBookData = parseBookLine(line);
+                library.addNewBook(parsedBookData.book(), parsedBookData.quantity());
             }
 
             System.out.println("Книги успішно завантажено з файлу.");
-            return books;
+            return library;
 
         } catch (Exception e) {
-            System.out.println("Помилка зчитування файлу input.txt. Програму буде запущено з порожнім списком книг.");
-            return new ArrayList<>();
+            System.out.println("Помилка зчитування файлу input.txt. Програму буде запущено з порожньою бібліотекою.");
+            return new Library();
         }
     }
 
     /**
-     * Зберігає книги у файл.
+     * Зберігає бібліотеку у файл.
      */
-    private static void saveBooksToFile(List<Book> books) {
+    private static void saveLibraryToFile(Library library) {
         Path path = Path.of(FILE_NAME);
 
         try (BufferedWriter writer = Files.newBufferedWriter(path)) {
-            for (Book book : books) {
-                writer.write(serializeBook(book));
+            for (int i = 0; i < library.getBooks().size(); i++) {
+                Book book = library.getBooks().get(i);
+                int quantity = library.getQuantityByIndex(i);
+
+                writer.write(serializeBook(book, quantity));
                 writer.newLine();
             }
 
@@ -452,7 +427,7 @@ public class Main {
     /**
      * Перетворює книгу у рядок для збереження.
      */
-    private static String serializeBook(Book book) {
+    private static String serializeBook(Book book, int quantity) {
         if (book instanceof EBook eBook) {
             return "EBook;" +
                     eBook.getTitle() + ";" +
@@ -461,7 +436,8 @@ public class Main {
                     eBook.getPages() + ";" +
                     eBook.getGenre() + ";" +
                     eBook.getFileFormat() + ";" +
-                    eBook.getFileSize();
+                    eBook.getFileSize() + ";" +
+                    quantity;
         }
 
         if (book instanceof PrintedBook printedBook) {
@@ -472,7 +448,8 @@ public class Main {
                     printedBook.getPages() + ";" +
                     printedBook.getGenre() + ";" +
                     printedBook.getCoverType() + ";" +
-                    printedBook.getPrintRun();
+                    printedBook.getPrintRun() + ";" +
+                    quantity;
         }
 
         if (book instanceof AudioBook audioBook) {
@@ -483,7 +460,8 @@ public class Main {
                     audioBook.getPages() + ";" +
                     audioBook.getGenre() + ";" +
                     audioBook.getNarrator() + ";" +
-                    audioBook.getDurationMinutes();
+                    audioBook.getDurationMinutes() + ";" +
+                    quantity;
         }
 
         if (book instanceof ScientificBook scientificBook) {
@@ -494,7 +472,8 @@ public class Main {
                     scientificBook.getPages() + ";" +
                     scientificBook.getGenre() + ";" +
                     scientificBook.getFieldOfScience() + ";" +
-                    scientificBook.isPeerReviewed();
+                    scientificBook.isPeerReviewed() + ";" +
+                    quantity;
         }
 
         return "Book;" +
@@ -502,13 +481,14 @@ public class Main {
                 book.getAuthor() + ";" +
                 book.getYear() + ";" +
                 book.getPages() + ";" +
-                book.getGenre();
+                book.getGenre() + ";" +
+                quantity;
     }
 
     /**
-     * Створює об'єкт книги з рядка файлу.
+     * Зчитує книгу та її кількість з рядка файлу.
      */
-    private static Book parseBook(String line) {
+    private static ParsedBookData parseBookLine(String line) {
         String[] parts = line.split(";");
 
         if (parts.length == 0) {
@@ -519,61 +499,76 @@ public class Main {
 
         switch (type) {
             case "Book":
-                requirePartsCount(parts, 6);
-                return new Book(
-                        parts[1],
-                        parts[2],
-                        Integer.parseInt(parts[3]),
-                        Integer.parseInt(parts[4]),
-                        Genre.valueOf(parts[5])
+                requirePartsCount(parts, 7);
+                return new ParsedBookData(
+                        new Book(
+                                parts[1],
+                                parts[2],
+                                Integer.parseInt(parts[3]),
+                                Integer.parseInt(parts[4]),
+                                Genre.valueOf(parts[5])
+                        ),
+                        Integer.parseInt(parts[6])
                 );
 
             case "EBook":
-                requirePartsCount(parts, 8);
-                return new EBook(
-                        parts[1],
-                        parts[2],
-                        Integer.parseInt(parts[3]),
-                        Integer.parseInt(parts[4]),
-                        Genre.valueOf(parts[5]),
-                        parts[6],
-                        Double.parseDouble(parts[7])
+                requirePartsCount(parts, 9);
+                return new ParsedBookData(
+                        new EBook(
+                                parts[1],
+                                parts[2],
+                                Integer.parseInt(parts[3]),
+                                Integer.parseInt(parts[4]),
+                                Genre.valueOf(parts[5]),
+                                parts[6],
+                                Double.parseDouble(parts[7])
+                        ),
+                        Integer.parseInt(parts[8])
                 );
 
             case "PrintedBook":
-                requirePartsCount(parts, 8);
-                return new PrintedBook(
-                        parts[1],
-                        parts[2],
-                        Integer.parseInt(parts[3]),
-                        Integer.parseInt(parts[4]),
-                        Genre.valueOf(parts[5]),
-                        parts[6],
-                        Integer.parseInt(parts[7])
+                requirePartsCount(parts, 9);
+                return new ParsedBookData(
+                        new PrintedBook(
+                                parts[1],
+                                parts[2],
+                                Integer.parseInt(parts[3]),
+                                Integer.parseInt(parts[4]),
+                                Genre.valueOf(parts[5]),
+                                parts[6],
+                                Integer.parseInt(parts[7])
+                        ),
+                        Integer.parseInt(parts[8])
                 );
 
             case "AudioBook":
-                requirePartsCount(parts, 8);
-                return new AudioBook(
-                        parts[1],
-                        parts[2],
-                        Integer.parseInt(parts[3]),
-                        Integer.parseInt(parts[4]),
-                        Genre.valueOf(parts[5]),
-                        parts[6],
-                        Integer.parseInt(parts[7])
+                requirePartsCount(parts, 9);
+                return new ParsedBookData(
+                        new AudioBook(
+                                parts[1],
+                                parts[2],
+                                Integer.parseInt(parts[3]),
+                                Integer.parseInt(parts[4]),
+                                Genre.valueOf(parts[5]),
+                                parts[6],
+                                Integer.parseInt(parts[7])
+                        ),
+                        Integer.parseInt(parts[8])
                 );
 
             case "ScientificBook":
-                requirePartsCount(parts, 8);
-                return new ScientificBook(
-                        parts[1],
-                        parts[2],
-                        Integer.parseInt(parts[3]),
-                        Integer.parseInt(parts[4]),
-                        Genre.valueOf(parts[5]),
-                        parts[6],
-                        Boolean.parseBoolean(parts[7])
+                requirePartsCount(parts, 9);
+                return new ParsedBookData(
+                        new ScientificBook(
+                                parts[1],
+                                parts[2],
+                                Integer.parseInt(parts[3]),
+                                Integer.parseInt(parts[4]),
+                                Genre.valueOf(parts[5]),
+                                parts[6],
+                                Boolean.parseBoolean(parts[7])
+                        ),
+                        Integer.parseInt(parts[8])
                 );
 
             default:
@@ -588,5 +583,11 @@ public class Main {
         if (parts.length != expected) {
             throw new IllegalArgumentException("Невірний формат рядка.");
         }
+    }
+
+    /**
+     * Допоміжний record для зчитування книги та кількості.
+     */
+    private record ParsedBookData(Book book, int quantity) {
     }
 }
