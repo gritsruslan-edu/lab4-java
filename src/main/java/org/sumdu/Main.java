@@ -1,9 +1,11 @@
 package org.sumdu;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 /**
- * Драйвер програми для роботи з бібліотекою та книгами.
+ * Драйвер програми для роботи з книгами.
  */
 public class Main {
 
@@ -13,31 +15,35 @@ public class Main {
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
-        Library library = new Library("Моя бібліотека");
+        List<Book> books = new ArrayList<>();
 
         boolean running = true;
 
         while (running) {
 
             System.out.println("\nОберіть дію:");
-            System.out.println("1 - Створити нову книгу");
-            System.out.println("2 - Вивести всі книги");
-            System.out.println("3 - Вивести кількість створених об'єктів Book");
-            System.out.println("4 - Завершити програму");
+            System.out.println("1 - Створити звичайну книгу");
+            System.out.println("2 - Створити електронну книгу");
+            System.out.println("3 - Створити друковану книгу");
+            System.out.println("4 - Вивести всі книги");
+            System.out.println("5 - Завершити програму");
 
             String choice = scanner.nextLine();
 
             switch (choice) {
                 case "1":
-                    createBook(scanner, library);
+                    createBook(scanner, books);
                     break;
                 case "2":
-                    printBooks(library);
+                    createEBook(scanner, books);
                     break;
                 case "3":
-                    System.out.println("Кількість створених об'єктів Book: " + Book.getBookCount());
+                    createPrintedBook(scanner, books);
                     break;
                 case "4":
+                    printBooks(books);
+                    break;
+                case "5":
                     running = false;
                     System.out.println("Програму завершено.");
                     break;
@@ -50,56 +56,124 @@ public class Main {
     }
 
     /**
-     * Створює нову книгу та додає її до бібліотеки.
+     * Створює об'єкт базового класу Book та додає його до колекції.
      */
-    private static void createBook(Scanner scanner, Library library) {
-
+    private static void createBook(Scanner scanner, List<Book> books) {
         try {
-            System.out.print("Назва: ");
-            String title = scanner.nextLine();
-
-            System.out.print("Автор: ");
-            String author = scanner.nextLine();
-
-            System.out.print("Рік: ");
-            int year = Integer.parseInt(scanner.nextLine());
-
-            System.out.print("Кількість сторінок: ");
-            int pages = Integer.parseInt(scanner.nextLine());
-
-            System.out.println("Оберіть жанр із переліку:");
-            for (Genre genre : Genre.values()) {
-                System.out.println("- " + genre);
-            }
-
-            System.out.print("Жанр: ");
-            String genreInput = scanner.nextLine().trim().toUpperCase();
-
-            Genre genre = Genre.valueOf(genreInput);
-
-            Book book = new Book(title, author, year, pages, genre);
-            library.addBook(book);
-
-            System.out.println("Книгу успішно додано!");
-
+            BookData data = readCommonBookData(scanner);
+            Book book = new Book(data.title(), data.author(), data.year(), data.pages(), data.genre());
+            books.add(book);
+            System.out.println("Звичайну книгу успішно додано!");
         } catch (IllegalArgumentException e) {
             System.out.println("Помилка: " + e.getMessage());
         }
     }
 
     /**
-     * Виводить усі книги з бібліотеки.
+     * Створює об'єкт похідного класу EBook та додає його до колекції.
      */
-    private static void printBooks(Library library) {
+    private static void createEBook(Scanner scanner, List<Book> books) {
+        try {
+            BookData data = readCommonBookData(scanner);
 
-        if (library.getBooks().isEmpty()) {
-            System.out.println("Бібліотека порожня.");
+            System.out.print("Формат файлу: ");
+            String fileFormat = scanner.nextLine();
+
+            System.out.print("Розмір файлу (MB): ");
+            double fileSize = Double.parseDouble(scanner.nextLine());
+
+            Book book = new EBook(
+                    data.title(),
+                    data.author(),
+                    data.year(),
+                    data.pages(),
+                    data.genre(),
+                    fileFormat,
+                    fileSize
+            );
+
+            books.add(book);
+            System.out.println("Електронну книгу успішно додано!");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Помилка: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Створює об'єкт похідного класу PrintedBook та додає його до колекції.
+     */
+    private static void createPrintedBook(Scanner scanner, List<Book> books) {
+        try {
+            BookData data = readCommonBookData(scanner);
+
+            System.out.print("Тип палітурки: ");
+            String coverType = scanner.nextLine();
+
+            System.out.print("Тираж: ");
+            int printRun = Integer.parseInt(scanner.nextLine());
+
+            Book book = new PrintedBook(
+                    data.title(),
+                    data.author(),
+                    data.year(),
+                    data.pages(),
+                    data.genre(),
+                    coverType,
+                    printRun
+            );
+
+            books.add(book);
+            System.out.println("Друковану книгу успішно додано!");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Помилка: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Зчитує спільні для всіх типів книг дані.
+     */
+    private static BookData readCommonBookData(Scanner scanner) {
+        System.out.print("Назва: ");
+        String title = scanner.nextLine();
+
+        System.out.print("Автор: ");
+        String author = scanner.nextLine();
+
+        System.out.print("Рік: ");
+        int year = Integer.parseInt(scanner.nextLine());
+
+        System.out.print("Кількість сторінок: ");
+        int pages = Integer.parseInt(scanner.nextLine());
+
+        System.out.println("Оберіть жанр із переліку:");
+        for (Genre genre : Genre.values()) {
+            System.out.println("- " + genre);
+        }
+
+        System.out.print("Жанр: ");
+        String genreInput = scanner.nextLine().trim().toUpperCase();
+        Genre genre = Genre.valueOf(genreInput);
+
+        return new BookData(title, author, year, pages, genre);
+    }
+
+    /**
+     * Виводить усі книги з колекції.
+     */
+    private static void printBooks(List<Book> books) {
+        if (books.isEmpty()) {
+            System.out.println("Список книг порожній.");
             return;
         }
 
-        System.out.println("\nКниги у бібліотеці \"" + library.getName() + "\":");
-        for (Book book : library.getBooks()) {
+        for (Book book : books) {
             System.out.println(book);
         }
+    }
+
+    /**
+     * Допоміжний record для зберігання спільних даних книги.
+     */
+    private record BookData(String title, String author, int year, int pages, Genre genre) {
     }
 }
