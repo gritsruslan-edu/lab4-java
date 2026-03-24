@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.Scanner;
 import java.util.Properties;
+import java.util.List;
 
 /**
  * Драйвер програми для роботи з книгами.
@@ -33,10 +34,10 @@ public class Main {
         boolean running = true;
 
         while (running) {
-            System.out.println("\nОберіть дію:");
             System.out.println("1 - Пошук об'єкта");
             System.out.println("2 - Створити новий об'єкт");
             System.out.println("3 - Завершити програму");
+            System.out.println("4 - Вивести всі об'єкти у відсортованому режимі");
 
             String choice = scanner.nextLine();
 
@@ -50,6 +51,9 @@ public class Main {
                 case "3":
                     running = false;
                     System.out.println("Програму завершено.");
+                    break;
+                case "4":
+                    printSortedBooks(repository);
                     break;
                 default:
                     System.out.println("Невірний вибір. Спробуйте ще раз.");
@@ -79,6 +83,24 @@ public class Main {
      */
     private static void searchMenu() {
         System.out.println("Пошук ще не реалізовано.");
+    }
+
+    /**
+     * Виводить усі книги з бази даних у відсортованому вигляді.
+     */
+    private static void printSortedBooks(BookRepository repository) {
+        List<BookRepository.BookRow> rows = repository.getAllBooks();
+
+        if (rows.isEmpty()) {
+            System.out.println("Список книг порожній.");
+            return;
+        }
+
+        rows.sort((row1, row2) -> row1.book().compareTo(row2.book()));
+
+        for (BookRepository.BookRow row : rows) {
+            System.out.println(row.book() + ", quantity=" + row.quantity());
+        }
     }
 
     /**
