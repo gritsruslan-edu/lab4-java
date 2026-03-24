@@ -157,28 +157,24 @@ public class Main {
     private static void createBookByType(Scanner scanner, Library library) {
         try {
             System.out.println("\nОберіть тип об'єкта:");
-            System.out.println("1 - Book");
-            System.out.println("2 - EBook");
-            System.out.println("3 - PrintedBook");
-            System.out.println("4 - AudioBook");
-            System.out.println("5 - ScientificBook");
+            System.out.println("1 - EBook");
+            System.out.println("2 - PrintedBook");
+            System.out.println("3 - AudioBook");
+            System.out.println("4 - ScientificBook");
 
             String typeChoice = scanner.nextLine();
 
             switch (typeChoice) {
                 case "1":
-                    createBook(scanner, library);
-                    break;
-                case "2":
                     createEBook(scanner, library);
                     break;
-                case "3":
+                case "2":
                     createPrintedBook(scanner, library);
                     break;
-                case "4":
+                case "3":
                     createAudioBook(scanner, library);
                     break;
-                case "5":
+                case "4":
                     createScientificBook(scanner, library);
                     break;
                 default:
@@ -187,23 +183,6 @@ public class Main {
         } catch (IllegalArgumentException e) {
             System.out.println("Помилка: " + e.getMessage());
         }
-    }
-
-    /**
-     * Створює об'єкт базового класу Book.
-     */
-    private static void createBook(Scanner scanner, Library library) {
-        String title = readTitle(scanner);
-        String author = readAuthor(scanner);
-        int year = readYear(scanner);
-        int pages = readPages(scanner);
-        Genre genre = readGenre(scanner);
-        int quantity = readQuantity(scanner);
-
-        Book book = new Book(title, author, year, pages, genre);
-        library.addNewBook(book, quantity);
-
-        System.out.println("Звичайну книгу успішно додано!");
     }
 
     /**
@@ -476,13 +455,7 @@ public class Main {
                     quantity;
         }
 
-        return "Book;" +
-                book.getTitle() + ";" +
-                book.getAuthor() + ";" +
-                book.getYear() + ";" +
-                book.getPages() + ";" +
-                book.getGenre() + ";" +
-                quantity;
+        throw new IllegalArgumentException("Невідомий тип книги.");
     }
 
     /**
@@ -498,19 +471,6 @@ public class Main {
         String type = parts[0];
 
         switch (type) {
-            case "Book":
-                requirePartsCount(parts, 7);
-                return new ParsedBookData(
-                        new Book(
-                                parts[1],
-                                parts[2],
-                                Integer.parseInt(parts[3]),
-                                Integer.parseInt(parts[4]),
-                                Genre.valueOf(parts[5])
-                        ),
-                        Integer.parseInt(parts[6])
-                );
-
             case "EBook":
                 requirePartsCount(parts, 9);
                 return new ParsedBookData(

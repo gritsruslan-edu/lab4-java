@@ -3,9 +3,9 @@ package org.sumdu;
 import java.util.Objects;
 
 /**
- * Базовий клас, що представляє книгу.
+ * Абстрактний базовий клас, що представляє книгу.
  */
-public class Book {
+public abstract class Book {
 
     /**
      * Назва книги.
@@ -141,20 +141,6 @@ public class Book {
             throw new IllegalArgumentException("Жанр не може бути null.");
         }
         this.genre = genre;
-    }
-
-    /**
-     * Повертає текстове представлення книги.
-     */
-    @Override
-    public String toString() {
-        return "Book{" +
-                "title='" + title + '\'' +
-                ", author='" + author + '\'' +
-                ", year=" + year +
-                ", pages=" + pages +
-                ", genre=" + genre +
-                '}';
     }
 
     /**
