@@ -34,25 +34,21 @@ public class Main {
         boolean running = true;
 
         while (running) {
-            System.out.println("1 - Пошук об'єкта");
-            System.out.println("2 - Створити новий об'єкт");
-            System.out.println("3 - Завершити програму");
-            System.out.println("4 - Вивести всі об'єкти у відсортованому режимі");
+            System.out.println("1 - Створити новий об'єкт");
+            System.out.println("2 - Завершити програму");
+            System.out.println("3 - Вивести всі об'єкти у відсортованому режимі");
 
             String choice = scanner.nextLine();
 
             switch (choice) {
                 case "1":
-                    searchMenu();
-                    break;
-                case "2":
                     createBookByType(scanner, repository);
                     break;
-                case "3":
+                case "2":
                     running = false;
                     System.out.println("Програму завершено.");
                     break;
-                case "4":
+                case "3":
                     sortMenu(scanner, repository);
                     break;
                 default:
@@ -186,13 +182,6 @@ public class Main {
         for (BookRepository.BookRow row : rows) {
             System.out.println(row.book() + ", quantity=" + row.quantity());
         }
-    }
-
-    /**
-     * Виводить повідомлення про нереалізований пошук.
-     */
-    private static void searchMenu() {
-        System.out.println("Пошук ще не реалізовано.");
     }
 
     /**
