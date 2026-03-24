@@ -5,7 +5,7 @@ import java.util.Objects;
 /**
  * Абстрактний базовий клас, що представляє книгу.
  */
-public abstract class Book {
+public abstract class Book implements Comparable<Book> {
 
     /**
      * Назва книги.
@@ -163,5 +163,14 @@ public abstract class Book {
     @Override
     public int hashCode() {
         return Objects.hash(title, author, year, pages, genre);
+    }
+
+
+    /**
+     * Порівнює книги за назвою.
+     */
+    @Override
+    public int compareTo(Book other) {
+        return this.title.compareToIgnoreCase(other.title);
     }
 }
