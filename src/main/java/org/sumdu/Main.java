@@ -1,9 +1,9 @@
 package org.sumdu;
 
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Comparator;
 import java.util.Scanner;
 import java.util.Properties;
 import java.util.List;
@@ -53,7 +53,7 @@ public class Main {
                     System.out.println("Програму завершено.");
                     break;
                 case "4":
-                    printSortedBooks(repository);
+                    sortMenu(scanner, repository);
                     break;
                 default:
                     System.out.println("Невірний вибір. Спробуйте ще раз.");
@@ -75,6 +75,116 @@ public class Main {
         } catch (IOException e) {
             System.out.println("Не вдалося зчитати файл конфігурації: " + e.getMessage());
             return null;
+        }
+    }
+
+
+    /**
+     * Виводить підменю сортування.
+     */
+    private static void sortMenu(Scanner scanner, BookRepository repository) {
+        boolean sorting = true;
+
+        while (sorting) {
+            System.out.println("\nОберіть критерій сортування:");
+            System.out.println("1 - Сортувати за назвою");
+            System.out.println("2 - Сортувати за роком видання");
+            System.out.println("3 - Сортувати за кількістю сторінок");
+            System.out.println("4 - Повернутися до головного меню");
+
+            String choice = scanner.nextLine();
+
+            switch (choice) {
+                case "1":
+                    printSortedBooksByTitle(repository);
+                    break;
+                case "2":
+                    printSortedBooksByYear(repository);
+                    break;
+                case "3":
+                    printSortedBooksByPages(repository);
+                    break;
+                case "4":
+                    sorting = false;
+                    break;
+                default:
+                    System.out.println("Невірний вибір. Спробуйте ще раз.");
+            }
+        }
+    }
+
+    /**
+     * Виводить усі книги з бази даних, відсортовані за назвою.
+     */
+    private static void printSortedBooksByTitle(BookRepository repository) {
+        List<BookRepository.BookRow> rows = repository.getAllBooks();
+
+        if (rows.isEmpty()) {
+            System.out.println("Список книг порожній.");
+            return;
+        }
+
+        Comparator<BookRepository.BookRow> cmp = new Comparator<BookRepository.BookRow>() {
+            @Override
+            public int compare(BookRepository.BookRow o1, BookRepository.BookRow o2) {
+                return o1.book().getTitle().compareToIgnoreCase(o2.book().getTitle());
+            }
+        };
+
+        rows.sort(cmp);
+
+        for (BookRepository.BookRow row : rows) {
+            System.out.println(row.book() + ", quantity=" + row.quantity());
+        }
+    }
+
+    /**
+     * Виводить усі книги з бази даних, відсортовані за роком видання.
+     */
+    private static void printSortedBooksByYear(BookRepository repository) {
+        List<BookRepository.BookRow> rows = repository.getAllBooks();
+
+        if (rows.isEmpty()) {
+            System.out.println("Список книг порожній.");
+            return;
+        }
+
+        Comparator<BookRepository.BookRow> cmp = new Comparator<BookRepository.BookRow>() {
+            @Override
+            public int compare(BookRepository.BookRow o1, BookRepository.BookRow o2) {
+                return Integer.compare(o1.book().getYear(), o2.book().getYear());
+            }
+        };
+
+        rows.sort(cmp);
+
+        for (BookRepository.BookRow row : rows) {
+            System.out.println(row.book() + ", quantity=" + row.quantity());
+        }
+    }
+
+    /**
+     * Виводить усі книги з бази даних, відсортовані за кількістю сторінок.
+     */
+    private static void printSortedBooksByPages(BookRepository repository) {
+        List<BookRepository.BookRow> rows = repository.getAllBooks();
+
+        if (rows.isEmpty()) {
+            System.out.println("Список книг порожній.");
+            return;
+        }
+
+        Comparator<BookRepository.BookRow> cmp = new Comparator<BookRepository.BookRow>() {
+            @Override
+            public int compare(BookRepository.BookRow o1, BookRepository.BookRow o2) {
+                return Integer.compare(o1.book().getPages(), o2.book().getPages());
+            }
+        };
+
+        rows.sort(cmp);
+
+        for (BookRepository.BookRow row : rows) {
+            System.out.println(row.book() + ", quantity=" + row.quantity());
         }
     }
 
