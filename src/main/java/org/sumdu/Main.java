@@ -120,12 +120,7 @@ public class Main {
             return;
         }
 
-        Comparator<BookRepository.BookRow> cmp = new Comparator<BookRepository.BookRow>() {
-            @Override
-            public int compare(BookRepository.BookRow o1, BookRepository.BookRow o2) {
-                return o1.book().getTitle().compareToIgnoreCase(o2.book().getTitle());
-            }
-        };
+        Comparator<BookRepository.BookRow> cmp = (o1, o2) -> o1.book().getTitle().compareToIgnoreCase(o2.book().getTitle());
 
         rows.sort(cmp);
 
@@ -145,12 +140,7 @@ public class Main {
             return;
         }
 
-        Comparator<BookRepository.BookRow> cmp = new Comparator<BookRepository.BookRow>() {
-            @Override
-            public int compare(BookRepository.BookRow o1, BookRepository.BookRow o2) {
-                return Integer.compare(o1.book().getYear(), o2.book().getYear());
-            }
-        };
+        Comparator<BookRepository.BookRow> cmp = (o1, o2) -> Integer.compare(o1.book().getYear(), o2.book().getYear());
 
         rows.sort(cmp);
 
@@ -170,12 +160,7 @@ public class Main {
             return;
         }
 
-        Comparator<BookRepository.BookRow> cmp = new Comparator<BookRepository.BookRow>() {
-            @Override
-            public int compare(BookRepository.BookRow o1, BookRepository.BookRow o2) {
-                return Integer.compare(o1.book().getPages(), o2.book().getPages());
-            }
-        };
+        Comparator<BookRepository.BookRow> cmp = (o1, o2) -> Integer.compare(o1.book().getPages(), o2.book().getPages());
 
         rows.sort(cmp);
 
