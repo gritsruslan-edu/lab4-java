@@ -1,5 +1,8 @@
 package org.sumdu;
 
+import org.sumdu.exceptions.BookNotFoundException;
+import org.sumdu.exceptions.InvalidFieldValueException;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -28,50 +31,15 @@ public class Library {
     }
 
     /**
-     * Шукає книгу за UUID.
-     */
-    public Book findByUuid(UUID uuid) {
-        if (uuid == null) {
-            return null;
-        }
-
-        for (Book book : books) {
-            if (uuid.equals(book.getUuid())) {
-                return book;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Оновлює об'єкт у колекції.
-     */
-    public boolean update(Book existingObject, Book newObject) {
-        if (existingObject == null || newObject == null) {
-            return false;
-        }
-
-        int index = books.indexOf(existingObject);
-
-        if (index == -1) {
-            return false;
-        }
-
-        books.set(index, newObject);
-        return true;
-    }
-
-    /**
      * Додає нову книгу або збільшує кількість існуючої.
      */
     public void addNewBook(Book bk, int quantity) {
         if (bk == null) {
-            throw new IllegalArgumentException("Книга не може бути null.");
+            throw new InvalidFieldValueException("Книга не може бути null.");
         }
 
         if (quantity <= 0) {
-            throw new IllegalArgumentException("Кількість повинна бути більше 0.");
+            throw new InvalidFieldValueException("Кількість повинна бути більше 0.");
         }
 
         int index = books.indexOf(bk);
@@ -118,25 +86,6 @@ public class Library {
         }
 
         return foundBooks;
-    }
-
-    /**
-     * Видаляє об'єкт із колекції.
-     */
-    public boolean delete(Book existingObject) {
-        if (existingObject == null) {
-            return false;
-        }
-
-        int index = books.indexOf(existingObject);
-
-        if (index == -1) {
-            return false;
-        }
-
-        books.remove(index);
-        quantities.remove(index);
-        return true;
     }
 
     /**
@@ -187,5 +136,59 @@ public class Library {
      */
     public boolean isEmpty() {
         return books.isEmpty();
+    }
+
+    /**
+     * Шукає книгу за UUID.
+     */
+    public Book findByUuid(UUID uuid) {
+        if (uuid == null) {
+            throw new InvalidFieldValueException("UUID не може бути null.");
+        }
+
+        for (Book book : books) {
+            if (uuid.equals(book.getUuid())) {
+                return book;
+            }
+        }
+
+        throw new BookNotFoundException("Книгу з таким UUID не знайдено.");
+    }
+
+    /**
+     * Оновлює об'єкт у колекції.
+     */
+    public boolean update(Book existingObject, Book newObject) {
+        if (existingObject == null || newObject == null) {
+            throw new InvalidFieldValueException("Об'єкти для оновлення не можуть бути null.");
+        }
+
+        int index = books.indexOf(existingObject);
+
+        if (index == -1) {
+            throw new BookNotFoundException("Об'єкт для оновлення не знайдено.");
+        }
+
+        books.set(index, newObject);
+        return true;
+    }
+
+    /**
+     * Видаляє об'єкт із колекції.
+     */
+    public boolean delete(Book existingObject) {
+        if (existingObject == null) {
+            throw new InvalidFieldValueException("Об'єкт для видалення не може бути null.");
+        }
+
+        int index = books.indexOf(existingObject);
+
+        if (index == -1) {
+            throw new BookNotFoundException("Об'єкт для видалення не знайдено.");
+        }
+
+        books.remove(index);
+        quantities.remove(index);
+        return true;
     }
 }

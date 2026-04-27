@@ -1,5 +1,8 @@
 package org.sumdu;
 
+import org.sumdu.exceptions.BookNotFoundException;
+import org.sumdu.exceptions.InvalidFieldValueException;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -71,27 +74,18 @@ public class Main {
         System.out.print("Введіть UUID книги для видалення: ");
         String uuidText = scanner.nextLine().trim();
 
-        UUID uuid;
         try {
-            uuid = UUID.fromString(uuidText);
+            UUID uuid = UUID.fromString(uuidText);
+            Book existingBook = library.findByUuid(uuid);
+            boolean deleted = library.delete(existingBook);
+
+            if (deleted) {
+                System.out.println("Об'єкт успішно видалено.");
+            }
         } catch (IllegalArgumentException e) {
             System.out.println("Невірний формат UUID.");
-            return;
-        }
-
-        Book existingBook = library.findByUuid(uuid);
-
-        if (existingBook == null) {
-            System.out.println("Книгу не знайдено.");
-            return;
-        }
-
-        boolean deleted = library.delete(existingBook);
-
-        if (deleted) {
-            System.out.println("Об'єкт успішно видалено.");
-        } else {
-            System.out.println("Не вдалося видалити об'єкт.");
+        } catch (BookNotFoundException | InvalidFieldValueException e) {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -107,34 +101,25 @@ public class Main {
         System.out.print("Введіть UUID книги для модифікації: ");
         String uuidText = scanner.nextLine().trim();
 
-        UUID uuid;
         try {
-            uuid = UUID.fromString(uuidText);
+            UUID uuid = UUID.fromString(uuidText);
+            Book existingBook = library.findByUuid(uuid);
+            Book updatedBook = buildUpdatedBook(scanner, existingBook);
+
+            if (updatedBook == null) {
+                System.out.println("Модифікацію скасовано.");
+                return;
+            }
+
+            boolean updated = library.update(existingBook, updatedBook);
+
+            if (updated) {
+                System.out.println("Об'єкт успішно оновлено.");
+            }
         } catch (IllegalArgumentException e) {
             System.out.println("Невірний формат UUID.");
-            return;
-        }
-
-        Book existingBook = library.findByUuid(uuid);
-
-        if (existingBook == null) {
-            System.out.println("Книгу не знайдено.");
-            return;
-        }
-
-        Book updatedBook = buildUpdatedBook(scanner, existingBook);
-
-        if (updatedBook == null) {
-            System.out.println("Модифікацію скасовано.");
-            return;
-        }
-
-        boolean updated = library.update(existingBook, updatedBook);
-
-        if (updated) {
-            System.out.println("Об'єкт успішно оновлено.");
-        } else {
-            System.out.println("Не вдалося оновити об'єкт.");
+        } catch (BookNotFoundException | InvalidFieldValueException e) {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -429,22 +414,15 @@ public class Main {
         System.out.print("Введіть UUID книги: ");
         String uuidText = scanner.nextLine().trim();
 
-        UUID uuid;
         try {
-            uuid = UUID.fromString(uuidText);
+            UUID uuid = UUID.fromString(uuidText);
+            Book book = library.findByUuid(uuid);
+            System.out.println(book + ", quantity=" + library.getQuantityForBook(book));
         } catch (IllegalArgumentException e) {
             System.out.println("Невірний формат UUID.");
-            return;
+        } catch (BookNotFoundException | InvalidFieldValueException e) {
+            System.out.println(e.getMessage());
         }
-
-        Book book = library.findByUuid(uuid);
-
-        if (book == null) {
-            System.out.println("Книгу не знайдено.");
-            return;
-        }
-
-        System.out.println(book + ", quantity=" + library.getQuantityForBook(book));
     }
 
     /**
@@ -510,6 +488,8 @@ public class Main {
                 default:
                     System.out.println("Невірний тип об'єкта.");
             }
+        } catch (InvalidFieldValueException e) {
+            System.out.println(e.getMessage());
         } catch (IllegalArgumentException e) {
             System.out.println("Помилка: " + e.getMessage());
         }
