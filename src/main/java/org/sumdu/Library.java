@@ -2,6 +2,7 @@ package org.sumdu;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Клас бібліотеки для зберігання книг та їх кількості.
@@ -24,6 +25,23 @@ public class Library {
     public Library() {
         books = new ArrayList<>();
         quantities = new ArrayList<>();
+    }
+
+    /**
+     * Шукає книгу за UUID.
+     */
+    public Book findByUuid(UUID uuid) {
+        if (uuid == null) {
+            return null;
+        }
+
+        for (Book book : books) {
+            if (uuid.equals(book.getUuid())) {
+                return book;
+            }
+        }
+
+        return null;
     }
 
     /**

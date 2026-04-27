@@ -1,5 +1,7 @@
 package org.sumdu;
 
+import java.util.Objects;
+
 /**
  * Похідний клас, що представляє аудіокнигу.
  */
@@ -65,7 +67,8 @@ public class AudioBook extends Book {
     @Override
     public String toString() {
         return "AudioBook{" +
-                "title='" + getTitle() + '\'' +
+                "uuid=" + getUuid() +
+                ", title='" + getTitle() + '\'' +
                 ", author='" + getAuthor() + '\'' +
                 ", year=" + getYear() +
                 ", pages=" + getPages() +
@@ -73,5 +76,25 @@ public class AudioBook extends Book {
                 ", narrator='" + narrator + '\'' +
                 ", durationMinutes=" + durationMinutes +
                 '}';
+    }
+
+    /**
+     * Порівнює аудіокниги.
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AudioBook that)) return false;
+        if (!super.equals(o)) return false;
+        return durationMinutes == that.durationMinutes &&
+                Objects.equals(narrator, that.narrator);
+    }
+
+    /**
+     * Повертає хеш-код аудіокниги.
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), narrator, durationMinutes);
     }
 }

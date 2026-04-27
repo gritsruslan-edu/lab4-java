@@ -1,11 +1,17 @@
 package org.sumdu;
 
 import java.util.Objects;
+import java.util.UUID;
 
 /**
- * Базовий клас, що представляє книгу.
+ * Абстрактний базовий клас, що представляє книгу.
  */
-public class Book {
+public abstract class Book implements Comparable<Book>, Identifiable {
+
+    /**
+     * Унікальний ідентифікатор книги.
+     */
+    private UUID uuid;
 
     /**
      * Назва книги.
@@ -36,6 +42,7 @@ public class Book {
      * Створює новий об'єкт книги.
      */
     public Book(String title, String author, int year, int pages, Genre genre) {
+        this.uuid = UUID.randomUUID();
         setTitle(title);
         setAuthor(author);
         setYear(year);
@@ -51,11 +58,30 @@ public class Book {
             throw new IllegalArgumentException("Об'єкт для копіювання не може бути null.");
         }
 
+        this.uuid = UUID.randomUUID();
         this.title = other.title;
         this.author = other.author;
         this.year = other.year;
         this.pages = other.pages;
         this.genre = other.genre;
+    }
+
+    /**
+     * Встановлює UUID книги.
+     */
+    protected void setUuid(UUID uuid) {
+        if (uuid == null) {
+            throw new IllegalArgumentException("UUID не може бути null.");
+        }
+        this.uuid = uuid;
+    }
+
+    /**
+     * Повертає UUID книги.
+     */
+    @Override
+    public UUID getUuid() {
+        return uuid;
     }
 
     /**
@@ -144,17 +170,11 @@ public class Book {
     }
 
     /**
-     * Повертає текстове представлення книги.
+     * Порівнює книги за назвою.
      */
     @Override
-    public String toString() {
-        return "Book{" +
-                "title='" + title + '\'' +
-                ", author='" + author + '\'' +
-                ", year=" + year +
-                ", pages=" + pages +
-                ", genre=" + genre +
-                '}';
+    public int compareTo(Book other) {
+        return this.title.compareToIgnoreCase(other.title);
     }
 
     /**
@@ -166,6 +186,7 @@ public class Book {
         if (!(o instanceof Book book)) return false;
         return year == book.year
                 && pages == book.pages
+                && Objects.equals(uuid, book.uuid)
                 && Objects.equals(title, book.title)
                 && Objects.equals(author, book.author)
                 && genre == book.genre;
@@ -176,6 +197,6 @@ public class Book {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(title, author, year, pages, genre);
+        return Objects.hash(uuid, title, author, year, pages, genre);
     }
 }

@@ -1,5 +1,7 @@
 package org.sumdu;
 
+import java.util.Objects;
+
 /**
  * Похідний клас, що представляє наукову книгу.
  */
@@ -62,7 +64,8 @@ public class ScientificBook extends Book {
     @Override
     public String toString() {
         return "ScientificBook{" +
-                "title='" + getTitle() + '\'' +
+                "uuid=" + getUuid() +
+                ", title='" + getTitle() + '\'' +
                 ", author='" + getAuthor() + '\'' +
                 ", year=" + getYear() +
                 ", pages=" + getPages() +
@@ -70,5 +73,25 @@ public class ScientificBook extends Book {
                 ", fieldOfScience='" + fieldOfScience + '\'' +
                 ", peerReviewed=" + peerReviewed +
                 '}';
+    }
+
+    /**
+     * Порівнює наукові книги.
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ScientificBook that)) return false;
+        if (!super.equals(o)) return false;
+        return peerReviewed == that.peerReviewed &&
+                Objects.equals(fieldOfScience, that.fieldOfScience);
+    }
+
+    /**
+     * Повертає хеш-код наукової книги.
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), fieldOfScience, peerReviewed);
     }
 }

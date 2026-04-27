@@ -1,5 +1,7 @@
 package org.sumdu;
 
+import java.util.Objects;
+
 /**
  * Похідний клас, що представляє друковану книгу.
  */
@@ -65,7 +67,8 @@ public class PrintedBook extends Book {
     @Override
     public String toString() {
         return "PrintedBook{" +
-                "title='" + getTitle() + '\'' +
+                "uuid=" + getUuid() +
+                ", title='" + getTitle() + '\'' +
                 ", author='" + getAuthor() + '\'' +
                 ", year=" + getYear() +
                 ", pages=" + getPages() +
@@ -73,5 +76,25 @@ public class PrintedBook extends Book {
                 ", coverType='" + coverType + '\'' +
                 ", printRun=" + printRun +
                 '}';
+    }
+
+    /**
+     * Порівнює друковані книги.
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PrintedBook that)) return false;
+        if (!super.equals(o)) return false;
+        return printRun == that.printRun &&
+                Objects.equals(coverType, that.coverType);
+    }
+
+    /**
+     * Повертає хеш-код друкованої книги.
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), coverType, printRun);
     }
 }
