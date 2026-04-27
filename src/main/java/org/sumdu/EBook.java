@@ -1,5 +1,7 @@
 package org.sumdu;
 
+import java.util.Objects;
+
 /**
  * Похідний клас, що представляє електронну книгу.
  */
@@ -65,7 +67,8 @@ public class EBook extends Book {
     @Override
     public String toString() {
         return "EBook{" +
-                "title='" + getTitle() + '\'' +
+                "uuid=" + getUuid() +
+                ", title='" + getTitle() + '\'' +
                 ", author='" + getAuthor() + '\'' +
                 ", year=" + getYear() +
                 ", pages=" + getPages() +
@@ -73,5 +76,25 @@ public class EBook extends Book {
                 ", fileFormat='" + fileFormat + '\'' +
                 ", fileSize=" + fileSize +
                 '}';
+    }
+
+    /**
+     * Порівнює електронні книги.
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof EBook eBook)) return false;
+        if (!super.equals(o)) return false;
+        return Double.compare(eBook.fileSize, fileSize) == 0 &&
+                Objects.equals(fileFormat, eBook.fileFormat);
+    }
+
+    /**
+     * Повертає хеш-код електронної книги.
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), fileFormat, fileSize);
     }
 }

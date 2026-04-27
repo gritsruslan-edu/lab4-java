@@ -4,9 +4,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Comparator;
-import java.util.Scanner;
-import java.util.Properties;
 import java.util.List;
+import java.util.Properties;
+import java.util.Scanner;
+import java.util.UUID;
 
 /**
  * Драйвер програми для роботи з книгами.
@@ -34,9 +35,11 @@ public class Main {
         boolean running = true;
 
         while (running) {
+            System.out.println("\nОберіть дію:");
             System.out.println("1 - Створити новий об'єкт");
             System.out.println("2 - Завершити програму");
             System.out.println("3 - Вивести всі об'єкти у відсортованому режимі");
+            System.out.println("4 - Пошук за ідентифікатором");
 
             String choice = scanner.nextLine();
 
@@ -50,6 +53,9 @@ public class Main {
                     break;
                 case "3":
                     sortMenu(scanner, repository);
+                    break;
+                case "4":
+                    findBookByUuid(scanner, repository);
                     break;
                 default:
                     System.out.println("Невірний вибір. Спробуйте ще раз.");
@@ -74,6 +80,30 @@ public class Main {
         }
     }
 
+    /**
+     * Шукає книгу за UUID.
+     */
+    private static void findBookByUuid(Scanner scanner, BookRepository repository) {
+        System.out.print("Введіть UUID книги: ");
+        String uuidText = scanner.nextLine().trim();
+
+        UUID uuid;
+        try {
+            uuid = UUID.fromString(uuidText);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Невірний формат UUID.");
+            return;
+        }
+
+        BookRepository.BookRow row = repository.findByUuid(uuid);
+
+        if (row == null) {
+            System.out.println("Книгу не знайдено.");
+            return;
+        }
+
+        System.out.println(row.book() + ", quantity=" + row.quantity());
+    }
 
     /**
      * Виводить підменю сортування.
@@ -106,84 +136,6 @@ public class Main {
                 default:
                     System.out.println("Невірний вибір. Спробуйте ще раз.");
             }
-        }
-    }
-
-    /**
-     * Виводить усі книги з бази даних, відсортовані за назвою.
-     */
-    private static void printSortedBooksByTitle(BookRepository repository) {
-        List<BookRepository.BookRow> rows = repository.getAllBooks();
-
-        if (rows.isEmpty()) {
-            System.out.println("Список книг порожній.");
-            return;
-        }
-
-        Comparator<BookRepository.BookRow> cmp = (o1, o2) -> o1.book().getTitle().compareToIgnoreCase(o2.book().getTitle());
-
-        rows.sort(cmp);
-
-        for (BookRepository.BookRow row : rows) {
-            System.out.println(row.book() + ", quantity=" + row.quantity());
-        }
-    }
-
-    /**
-     * Виводить усі книги з бази даних, відсортовані за роком видання.
-     */
-    private static void printSortedBooksByYear(BookRepository repository) {
-        List<BookRepository.BookRow> rows = repository.getAllBooks();
-
-        if (rows.isEmpty()) {
-            System.out.println("Список книг порожній.");
-            return;
-        }
-
-        Comparator<BookRepository.BookRow> cmp = (o1, o2) -> Integer.compare(o1.book().getYear(), o2.book().getYear());
-
-        rows.sort(cmp);
-
-        for (BookRepository.BookRow row : rows) {
-            System.out.println(row.book() + ", quantity=" + row.quantity());
-        }
-    }
-
-    /**
-     * Виводить усі книги з бази даних, відсортовані за кількістю сторінок.
-     */
-    private static void printSortedBooksByPages(BookRepository repository) {
-        List<BookRepository.BookRow> rows = repository.getAllBooks();
-
-        if (rows.isEmpty()) {
-            System.out.println("Список книг порожній.");
-            return;
-        }
-
-        Comparator<BookRepository.BookRow> cmp = (o1, o2) -> Integer.compare(o1.book().getPages(), o2.book().getPages());
-
-        rows.sort(cmp);
-
-        for (BookRepository.BookRow row : rows) {
-            System.out.println(row.book() + ", quantity=" + row.quantity());
-        }
-    }
-
-    /**
-     * Виводить усі книги з бази даних у відсортованому вигляді.
-     */
-    private static void printSortedBooks(BookRepository repository) {
-        List<BookRepository.BookRow> rows = repository.getAllBooks();
-
-        if (rows.isEmpty()) {
-            System.out.println("Список книг порожній.");
-            return;
-        }
-
-        rows.sort((row1, row2) -> row1.book().compareTo(row2.book()));
-
-        for (BookRepository.BookRow row : rows) {
-            System.out.println(row.book() + ", quantity=" + row.quantity());
         }
     }
 
@@ -369,5 +321,80 @@ public class Main {
     private static int readQuantity(Scanner scanner) {
         System.out.print("Кількість: ");
         return Integer.parseInt(scanner.nextLine());
+    }
+
+    /**
+     * Виводить усі книги з бази даних, відсортовані за назвою.
+     */
+    private static void printSortedBooksByTitle(BookRepository repository) {
+        List<BookRepository.BookRow> rows = repository.getAllBooks();
+
+        if (rows.isEmpty()) {
+            System.out.println("Список книг порожній.");
+            return;
+        }
+
+        Comparator<BookRepository.BookRow> cmp = new Comparator<BookRepository.BookRow>() {
+            @Override
+            public int compare(BookRepository.BookRow o1, BookRepository.BookRow o2) {
+                return o1.book().getTitle().compareToIgnoreCase(o2.book().getTitle());
+            }
+        };
+
+        rows.sort(cmp);
+
+        for (BookRepository.BookRow row : rows) {
+            System.out.println(row.book() + ", quantity=" + row.quantity());
+        }
+    }
+
+    /**
+     * Виводить усі книги з бази даних, відсортовані за роком видання.
+     */
+    private static void printSortedBooksByYear(BookRepository repository) {
+        List<BookRepository.BookRow> rows = repository.getAllBooks();
+
+        if (rows.isEmpty()) {
+            System.out.println("Список книг порожній.");
+            return;
+        }
+
+        Comparator<BookRepository.BookRow> cmp = new Comparator<BookRepository.BookRow>() {
+            @Override
+            public int compare(BookRepository.BookRow o1, BookRepository.BookRow o2) {
+                return Integer.compare(o1.book().getYear(), o2.book().getYear());
+            }
+        };
+
+        rows.sort(cmp);
+
+        for (BookRepository.BookRow row : rows) {
+            System.out.println(row.book() + ", quantity=" + row.quantity());
+        }
+    }
+
+    /**
+     * Виводить усі книги з бази даних, відсортовані за кількістю сторінок.
+     */
+    private static void printSortedBooksByPages(BookRepository repository) {
+        List<BookRepository.BookRow> rows = repository.getAllBooks();
+
+        if (rows.isEmpty()) {
+            System.out.println("Список книг порожній.");
+            return;
+        }
+
+        Comparator<BookRepository.BookRow> cmp = new Comparator<BookRepository.BookRow>() {
+            @Override
+            public int compare(BookRepository.BookRow o1, BookRepository.BookRow o2) {
+                return Integer.compare(o1.book().getPages(), o2.book().getPages());
+            }
+        };
+
+        rows.sort(cmp);
+
+        for (BookRepository.BookRow row : rows) {
+            System.out.println(row.book() + ", quantity=" + row.quantity());
+        }
     }
 }
