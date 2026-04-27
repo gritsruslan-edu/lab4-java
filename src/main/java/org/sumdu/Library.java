@@ -45,6 +45,24 @@ public class Library {
     }
 
     /**
+     * Оновлює об'єкт у колекції.
+     */
+    public boolean update(Book existingObject, Book newObject) {
+        if (existingObject == null || newObject == null) {
+            return false;
+        }
+
+        int index = books.indexOf(existingObject);
+
+        if (index == -1) {
+            return false;
+        }
+
+        books.set(index, newObject);
+        return true;
+    }
+
+    /**
      * Додає нову книгу або збільшує кількість існуючої.
      */
     public void addNewBook(Book bk, int quantity) {
