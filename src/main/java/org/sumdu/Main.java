@@ -25,8 +25,9 @@ public class Main {
             System.out.println("1 - Створити новий об'єкт");
             System.out.println("2 - Завершити програму");
             System.out.println("3 - Модифікувати об'єкт");
-            System.out.println("4 - Вивести всі об'єкти у відсортованому режимі");
-            System.out.println("5 - Пошук за ідентифікатором");
+            System.out.println("4 - Видалити об'єкт");
+            System.out.println("5 - Вивести всі об'єкти у відсортованому режимі");
+            System.out.println("6 - Пошук за ідентифікатором");
 
             String choice = scanner.nextLine();
 
@@ -42,9 +43,12 @@ public class Main {
                     modifyBook(scanner, library);
                     break;
                 case "4":
-                    sortMenu(scanner, library);
+                    deleteBook(scanner, library);
                     break;
                 case "5":
+                    sortMenu(scanner, library);
+                    break;
+                case "6":
                     findBookByUuid(scanner, library);
                     break;
                 default:
@@ -55,6 +59,41 @@ public class Main {
         scanner.close();
     }
 
+    /**
+     * Видаляє книгу з бібліотеки.
+     */
+    private static void deleteBook(Scanner scanner, Library library) {
+        if (library.isEmpty()) {
+            System.out.println("Список книг порожній.");
+            return;
+        }
+
+        System.out.print("Введіть UUID книги для видалення: ");
+        String uuidText = scanner.nextLine().trim();
+
+        UUID uuid;
+        try {
+            uuid = UUID.fromString(uuidText);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Невірний формат UUID.");
+            return;
+        }
+
+        Book existingBook = library.findByUuid(uuid);
+
+        if (existingBook == null) {
+            System.out.println("Книгу не знайдено.");
+            return;
+        }
+
+        boolean deleted = library.delete(existingBook);
+
+        if (deleted) {
+            System.out.println("Об'єкт успішно видалено.");
+        } else {
+            System.out.println("Не вдалося видалити об'єкт.");
+        }
+    }
 
     /**
      * Модифікує книгу в бібліотеці.

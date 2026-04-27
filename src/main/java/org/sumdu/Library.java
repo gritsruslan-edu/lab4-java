@@ -121,6 +121,25 @@ public class Library {
     }
 
     /**
+     * Видаляє об'єкт із колекції.
+     */
+    public boolean delete(Book existingObject) {
+        if (existingObject == null) {
+            return false;
+        }
+
+        int index = books.indexOf(existingObject);
+
+        if (index == -1) {
+            return false;
+        }
+
+        books.remove(index);
+        quantities.remove(index);
+        return true;
+    }
+
+    /**
      * Шукає книги за автором.
      */
     public List<Book> findBooksByAuthor(String author) {
